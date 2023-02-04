@@ -3,8 +3,8 @@ import 'package:sqflite/sqflite.dart';
 class DBHelper {
   static Database? _db;
 
-  static const String QUERY_TBL_PELANGGAN = """ 
-    CREATE TABLE pelangga(
+  static const String QUERY_TBL_CUSTOMER = """ 
+    CREATE TABLE customer(
       id INTEGER PRIMARY KEY,
       nama TEXT,
       gender TEXT,
@@ -18,7 +18,7 @@ class DBHelper {
 
   Future<Database> konekDB() async {
     return await openDatabase('dbku.db', version: 1, onCreate: (db, version) {
-      db.execute(QUERY_TBL_PELANGGAN);
+      db.execute(QUERY_TBL_CUSTOMER);
     });
   }
 }

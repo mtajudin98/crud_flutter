@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+import '../../helper/dbhelper.dart';
+
 class CustomerForm extends StatefulWidget {
   const CustomerForm({super.key});
 
@@ -16,6 +18,10 @@ class _CustomerFormState extends State<CustomerForm> {
     txtID = TextEditingController();
     txtNama = TextEditingController();
     txtTgllhr = TextEditingController();
+
+    lastID().then((value) {
+      txtID.text = '${value + 1}';
+    });
   }
 
   Widget txtInputID() => TextFormField(
@@ -63,14 +69,61 @@ class _CustomerFormState extends State<CustomerForm> {
       );
 
   Widget aksiSimpan() => TextButton(
-        onPressed: () {},
-        child: Text('Simpan', style: TextStyle(color: Colors.white)),
+        onPressed: () {
+          simpanData().then((h) {
+            var pesan = h == true ? 'Sukses simpan' : 'Gagal simpan';
+            showDialog(
+                context: context,
+                builder: (bc) => AlertDialog(
+                      title: const Text('Simpan Customer'),
+                      content: Text(pesan),
+                      actions: [
+                        TextButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                            child: const Text('Oke...'))
+                      ],
+                    ));
+          });
+        },
+        child: const Text('Simpan', style: TextStyle(color: Colors.white)),
       );
+  Future<int> lastID() async {
+    try {
+      final _db = await DBHelper.db();
+      const query = 'SELECT MAX(id) as id FROM customer';
+      final ls = (await _db?.rawQuery(query))!;
+      if (ls.isNotEmpty) {
+        return int.tryParse('${ls[0]['id']}') ?? 0;
+      }
+    } catch (e) {
+      print('error lastid $e');
+    }
+    return 0;
+  }
+
+  Future<bool> simpanData() async {
+    try {
+      final _db = await DBHelper.db();
+      var data = {
+        'id': txtID.value.text,
+        'nama': txtNama.value.text,
+        'gender': gender,
+        'tgl_lahir': txtTgllhr.value.text,
+      };
+      final id = await _db?.insert('customer', data);
+      return id! > 0;
+      // ignore: empty_catches
+    } catch (e) {}
+    return false;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Form Customer'),
+        title: const Text('Form Customer'),
         actions: [aksiSimpan()],
       ),
       body: Padding(
