@@ -77,6 +77,48 @@ class _CustomerListState extends State<CustomerList> {
             }
           });
         },
+        leading: PopupMenuButton(
+          itemBuilder: (bc) => [
+            const PopupMenuItem(
+              value: 'S',
+              child: Text('Edit Data'),
+            ),
+            const PopupMenuItem(
+              value: 'H',
+              child: Text('Hapus Data'),
+            )
+          ],
+          onSelected: (value) {
+            if (value == 'S') {
+              Navigator.push(context,
+                      MaterialPageRoute(builder: (c) => CustomerForm(data: d)))
+                  .then((value) {
+                if (value == true) refresh();
+              });
+            } else if (value == 'H') {
+              showDialog(
+                  context: context,
+                  builder: (c) => AlertDialog(
+                        content: Text('Customer ${d['nama']} ingin dihapus'),
+                        actions: [
+                          TextButton(
+                              onPressed: () {
+                                hapusData(d['id']).then((value) {
+                                  if (value == true) refresh();
+                                });
+                                Navigator.pop(context);
+                              },
+                              child: const Text('Ya, Saya yakin menghapus')),
+                          TextButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                              child: const Text('Tidak jadi hapus')),
+                        ],
+                      ));
+            }
+          },
+        ),
         title: Text('${d['nama']}'),
         trailing: Text('${d['gender']}'),
         subtitle: Text('${d['tgl_lahir']}'),
