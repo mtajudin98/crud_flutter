@@ -25,6 +25,26 @@ class _CustomerListState extends State<CustomerList> {
   }
 
   Widget item(Map d) => ListTile(
+        onLongPress: () {
+          showMenu(
+              context: context,
+              position: RelativeRect.fromLTRB(
+                  100, MediaQuery.of(context).size.height / 2, 100, 0),
+              items: [
+                const PopupMenuItem(
+                  value: 'S',
+                  child: Text('Edit Data'),
+                )
+              ]).then((value) {
+            if (value == 'S') {
+              Navigator.push(context,
+                      MaterialPageRoute(builder: (c) => CustomerForm(data: d)))
+                  .then((value) {
+                if (value == true) refresh();
+              });
+            }
+          });
+        },
         title: Text('${d['nama']}'),
         trailing: Text('${d['gender']}'),
         subtitle: Text('${d['tgl_lahir']}'),

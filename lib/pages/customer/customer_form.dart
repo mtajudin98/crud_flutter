@@ -4,20 +4,29 @@ import 'package:intl/intl.dart';
 import '../../helper/dbhelper.dart';
 
 class CustomerForm extends StatefulWidget {
-  const CustomerForm({super.key});
+  final Map? data;
+  const CustomerForm({super.key, this.data});
 
   @override
-  State<CustomerForm> createState() => _CustomerFormState();
+  State<CustomerForm> createState() => _CustomerFormState(data);
 }
 
 class _CustomerFormState extends State<CustomerForm> {
+  final Map? data;
   late TextEditingController txtID, txtNama, txtTgllhr;
   String gender = '', tgllhr = '';
 
-  _CustomerFormState() {
-    txtID = TextEditingController();
-    txtNama = TextEditingController();
-    txtTgllhr = TextEditingController();
+  _CustomerFormState(this.data) {
+    txtID = TextEditingController(text: '${data?['id'] ?? ''}');
+    txtNama = TextEditingController(text: '${data?['nama'] ?? ''}');
+    txtTgllhr = TextEditingController(text: '${data?['tgl_lahir'] ?? ''}');
+    gender = this.data?['gender'] ?? '';
+
+    if (data == null) {
+      lastID().then((value) {
+        txtID.text = '${value + 1}';
+      });
+    }
 
     lastID().then((value) {
       txtID.text = '${value + 1}';
@@ -84,7 +93,9 @@ class _CustomerFormState extends State<CustomerForm> {
                             },
                             child: const Text('Oke...'))
                       ],
-                    )).then((value) => Navigator.pop(context, h));
+                    )).then((value) {
+              Navigator.pop(context, h);
+            });
           });
         },
         child: const Text('Simpan', style: TextStyle(color: Colors.white)),
@@ -112,7 +123,11 @@ class _CustomerFormState extends State<CustomerForm> {
         'gender': gender,
         'tgl_lahir': txtTgllhr.value.text,
       };
-      final id = await _db?.insert('customer', data);
+
+      final id = this.data == null
+          ? await _db?.insert('customer', data)
+          : await _db?.update('customer', data,
+              where: 'id=?', whereArgs: [this.data!['id']]);
       return id! > 0;
       // ignore: empty_catches
     } catch (e) {}
