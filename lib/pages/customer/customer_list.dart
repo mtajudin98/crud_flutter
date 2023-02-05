@@ -32,8 +32,13 @@ class _CustomerListState extends State<CustomerList> {
 
   Widget btnTambah() => ElevatedButton(
         onPressed: () {
-          Navigator.push(
-              context, MaterialPageRoute(builder: (c) => const CustomerForm()));
+          Navigator.push(context,
+                  MaterialPageRoute(builder: (c) => const CustomerForm()))
+              .then((value) {
+            if (value == true) {
+              refresh();
+            }
+          });
         },
         child: const Text('Tambah Customer'),
       );

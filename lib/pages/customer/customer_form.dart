@@ -84,7 +84,7 @@ class _CustomerFormState extends State<CustomerForm> {
                             },
                             child: const Text('Oke...'))
                       ],
-                    ));
+                    )).then((value) => Navigator.pop(context, h));
           });
         },
         child: const Text('Simpan', style: TextStyle(color: Colors.white)),
